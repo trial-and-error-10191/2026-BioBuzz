@@ -60,10 +60,9 @@ public class NectarDifferentiateColor {
 
     public void ShowFindings() {
         telemetry.addData("Fretting the worst already", "");
-        telemetry.update();
-        while (!colorLocator.getBlobs().isEmpty()) {
+        if (!colorLocator.getBlobs().isEmpty()) {
             telemetry.addData("Blue nectar amount", colorLocator.getBlobs().get(0));
-            telemetry.update();
         }
+        telemetry.update();
     }
 }
