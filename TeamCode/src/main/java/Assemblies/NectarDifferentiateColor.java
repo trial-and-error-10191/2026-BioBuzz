@@ -34,11 +34,13 @@ public class NectarDifferentiateColor {
             .build();
 
     Telemetry telemetry;
+    VisionPortal visionPortal;
     VisionPortal.Builder builder = new VisionPortal.Builder();
     public NectarDifferentiateColor (HardwareMap hwMap, Telemetry telemetry) {
         // Create the vision portal by using a builder.
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
         builder.setCameraResolution(new Size(320, 240));
+        visionPortal = builder.build();
 
         this.telemetry = telemetry;
     }
