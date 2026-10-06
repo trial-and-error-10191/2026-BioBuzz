@@ -14,10 +14,6 @@ public class NectarDetectTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             nectarDiff.ShowFindings();
-            if (!nectarDiff.colorLocator.getBlobs().isEmpty()) {
-                telemetry.addData("Blue nectar amount", nectarDiff.colorLocator.getBlobs());
-                telemetry.update();
-            }
         }
     }
 }
