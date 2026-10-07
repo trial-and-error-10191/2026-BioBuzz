@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
@@ -67,6 +68,12 @@ public class BallDifferentiateColor {
     Telemetry telemetry;
     VisionPortal visionPortal;
     VisionPortal.Builder builder = new VisionPortal.Builder();
+
+    // Read the current lists
+    List<ColorBlobLocatorProcessor.Blob> blobsRed = colorLocatorRed.getBlobs();
+    List<ColorBlobLocatorProcessor.Blob> blobsBlue = colorLocatorBlue.getBlobs();
+    List<ColorBlobLocatorProcessor.Blob> blobsYellow = colorLocatorYellow.getBlobs();
+
     public BallDifferentiateColor(HardwareMap hwMap, Telemetry telemetry) {
         // Create the vision portal by using a builder.
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
@@ -78,12 +85,6 @@ public class BallDifferentiateColor {
     }
 
     public void FindBalls() {
-
-        // Read the current list
-        List<ColorBlobLocatorProcessor.Blob> blobsRed = colorLocatorRed.getBlobs();
-        List<ColorBlobLocatorProcessor.Blob> blobsBlue = colorLocatorBlue.getBlobs();
-        List<ColorBlobLocatorProcessor.Blob> blobsYellow = colorLocatorYellow.getBlobs();
-
         ColorBlobLocatorProcessor.Util.filterByCriteria(
                 ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
                 50, 20000, blobsRed);  // filter out very small blobs.
@@ -107,16 +108,20 @@ public class BallDifferentiateColor {
         ColorBlobLocatorProcessor.Util.filterByCriteria(
                 ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
                 0.6, 1, blobsYellow);
-
-        telemetry.addLine("Circularity Radius Center");
     }
 
     public void ShowFindings() {
         telemetry.addData("Fretting the worst already", "");
-        if (!colorLocatorBlue.getBlobs().isEmpty() || !colorLocatorRed.getBlobs().isEmpty()) {
-            telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs());
-            telemetry.addData("Blue nectar amount", colorLocatorBlue.getBlobs());
-            telemetry.addData("Pollen amount", colorLocatorYellow.getBlobs());
+        if (!colorLocatorBlue.getBlobs().isEmpty() || !colorLocatorRed.getBlobs().isEmpty() || !colorLocatorYellow.getBlobs().isEmpty()) {
+            telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs().size());
+//            telemetry.addData("Blue nectar amount", colorLocatorBlue.getBlobs().size());
+//            telemetry.addData("Pollen amount", colorLocatorYellow.getBlobs().size());
+        }
+        for (ColorBlobLocatorProcessor.Blob b : blobsRed) {
+            Circle circleFit = b.getCircle();
+            telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                    b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+            telemetry.addData("Circle Center", circleFit.getCenter());
         }
         telemetry.update();
     }

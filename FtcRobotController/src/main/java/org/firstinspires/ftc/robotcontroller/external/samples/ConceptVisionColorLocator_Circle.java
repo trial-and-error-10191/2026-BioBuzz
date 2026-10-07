@@ -268,12 +268,14 @@ public class ConceptVisionColorLocator_Circle extends LinearOpMode {
                 Circle circleFit = b.getCircle();
                 telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
                            b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                telemetry.addData("Circle Center", circleFit.getCenter());
             }
             for (ColorBlobLocatorProcessor.Blob b : blobsBlue) {
 
                 Circle circleFit = b.getCircle();
                 telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
                         b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                telemetry.addData("Circle Center", circleFit.getCenter());
             }
 
             telemetry.update();
