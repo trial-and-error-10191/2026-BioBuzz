@@ -84,6 +84,12 @@ public class BallDifferentiateColor {
         this.telemetry = telemetry;
     }
 
+    public void listUpdate() {
+        blobsRed = colorLocatorRed.getBlobs();
+        blobsBlue = colorLocatorBlue.getBlobs();
+        blobsYellow = colorLocatorYellow.getBlobs();
+    }
+
     public void FindBalls() {
         ColorBlobLocatorProcessor.Util.filterByCriteria(
                 ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
@@ -116,12 +122,27 @@ public class BallDifferentiateColor {
             telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs().size());
 //            telemetry.addData("Blue nectar amount", colorLocatorBlue.getBlobs().size());
 //            telemetry.addData("Pollen amount", colorLocatorYellow.getBlobs().size());
-        }
-        for (ColorBlobLocatorProcessor.Blob b : blobsRed) {
-            Circle circleFit = b.getCircle();
-            telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
-                    b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
-            telemetry.addData("Circle Center", circleFit.getCenter());
+            for (ColorBlobLocatorProcessor.Blob b : blobsRed) {
+                Circle circleFit = b.getCircle();
+                telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                        b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                telemetry.addData("Circle Center X Red", circleFit.getCenter().x);
+                telemetry.addData("Circle Center Y Red", circleFit.getCenter().y);
+            }
+            for (ColorBlobLocatorProcessor.Blob b : blobsBlue) {
+                Circle circleFit = b.getCircle();
+                telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                        b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                telemetry.addData("Circle Center X Blue", circleFit.getCenter().x);
+                telemetry.addData("Circle Center Y Blue", circleFit.getCenter().y);
+            }
+            for (ColorBlobLocatorProcessor.Blob b : blobsYellow) {
+                Circle circleFit = b.getCircle();
+                telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                        b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                telemetry.addData("Circle Center X Yellow", circleFit.getCenter().x);
+                telemetry.addData("Circle Center Y Yellow", circleFit.getCenter().y);
+            }
         }
         telemetry.update();
     }
