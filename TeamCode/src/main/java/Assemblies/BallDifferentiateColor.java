@@ -17,6 +17,8 @@ import java.util.List;
 
 public class BallDifferentiateColor {
 
+    public double ballDistInchRed,ballDistInchBlue, ballDistInchPollen;
+
     ColorBlobLocatorProcessor colorLocatorRed = new ColorBlobLocatorProcessor.Builder()
             .setTargetColorRange(ColorRange.RED)   // Use a predefined color match
             .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
@@ -116,10 +118,28 @@ public class BallDifferentiateColor {
                 0.6, 1, blobsYellow);
     }
 
+    public void ballDist() {
+        for (ColorBlobLocatorProcessor.Blob b : blobsRed) {
+            Circle circleFit = b.getCircle();
+            ballDistInchRed = Math.pow(circleFit.getRadius(), -0.82) * 378;
+        }
+        for (ColorBlobLocatorProcessor.Blob b : blobsBlue) {
+            Circle circleFit = b.getCircle();
+            ballDistInchBlue = Math.pow(circleFit.getRadius(), -0.82) * 378;
+        }
+        for (ColorBlobLocatorProcessor.Blob b : blobsYellow) {
+            Circle circleFit = b.getCircle();
+            ballDistInchPollen = Math.pow(Math.E, -0.0346 * circleFit.getRadius()) * 91;
+        }
+    }
+
     public void ShowFindings() {
         telemetry.addData("Fretting the worst already", "");
         if (!colorLocatorBlue.getBlobs().isEmpty() || !colorLocatorRed.getBlobs().isEmpty() || !colorLocatorYellow.getBlobs().isEmpty()) {
-            telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs().size());
+            telemetry.addData("Red nectar distance away from cam (inches)", ballDistInchRed);
+            telemetry.addData("Blue nectar distance away from cam (inches)", ballDistInchBlue);
+            telemetry.addData("Pollen distance away from cam (inches)", ballDistInchPollen);
+//            telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs().size());
 //            telemetry.addData("Blue nectar amount", colorLocatorBlue.getBlobs().size());
 //            telemetry.addData("Pollen amount", colorLocatorYellow.getBlobs().size());
             for (ColorBlobLocatorProcessor.Blob b : blobsRed) {

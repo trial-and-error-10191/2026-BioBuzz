@@ -13,6 +13,7 @@ public class NectarDetectTest extends LinearOpMode {
         ballDiff.FindBalls();
         waitForStart();
         while (opModeIsActive()) {
+            ballDiff.ballDist();
             ballDiff.listUpdate();
             ballDiff.ShowFindings();
         }
