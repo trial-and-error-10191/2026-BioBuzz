@@ -1,6 +1,7 @@
 package Assemblies;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -33,11 +34,16 @@ public class DriveTrainMecanum {
     static final double P_DRIVE_GAIN = 0.03;
     private double targetHeading = 0;
     private double driveSpeed = 0;
+    private double strafeSpeed = 0;
     private double turnSpeed = 0;
-    private double leftSpeed = 0;
-    private double rightSpeed = 0;
-    private int leftTarget = 0;
-    private int rightTarget = 0;
+    private double leftFrontSpeed = 0;
+    private double leftBackSpeed = 0;
+    private double rightFrontSpeed = 0;
+    private double rightBackSpeed = 0;
+    private int leftFrontTarget = 0;
+    private int leftBackTarget = 0;
+    private int rightFrontTarget = 0;
+    private int rightBackTarget = 0;
     private double headingError = 0;
     private double extensionPowerReductionIntensity = 7560;
     private int CurrentLiftCounts = 0;
@@ -53,8 +59,8 @@ public class DriveTrainMecanum {
 
         // Initializes motor directions:
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -83,10 +89,19 @@ public class DriveTrainMecanum {
         imu.resetYaw();
     }
 
-    // This function needs an axial, lateral, and yaw input. It uses this input to drive the drive train motors.
-    // The last two variables are for direction switching.
-    public void LiftHandle(int LiftCounts) {
-        CurrentLiftCounts = Math.abs(LiftCounts);
+    public void encoderSettings() {
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void fieldOrientedAuto(double axial, double lateral, double yaw) {
@@ -186,19 +201,19 @@ public class DriveTrainMecanum {
 
         // Determine new target position, and pass to motor controller
         int moveCounts = (int) (distance * COUNTS_PER_INCH);
-        leftTarget = leftFrontDrive.getCurrentPosition() + moveCounts;
-        leftTarget = leftBackDrive.getCurrentPosition() + moveCounts;
-        rightTarget = rightFrontDrive.getCurrentPosition() + moveCounts;
-        rightTarget = rightBackDrive.getCurrentPosition() + moveCounts;
+        leftFrontTarget = leftFrontDrive.getCurrentPosition() + moveCounts;
+        leftBackTarget = leftBackDrive.getCurrentPosition() + moveCounts;
+        rightFrontTarget = rightFrontDrive.getCurrentPosition() + moveCounts;
+        rightBackTarget = rightBackDrive.getCurrentPosition() + moveCounts;
 
         // Set Target FIRST, then turn on RUN_TO_POSITION
         // If Strafing then reverse motor directions
 
 
-        leftFrontDrive.setTargetPosition(leftTarget);
-        rightFrontDrive.setTargetPosition(rightTarget);
-        leftBackDrive.setTargetPosition(leftTarget);
-        rightBackDrive.setTargetPosition(rightTarget);
+        leftFrontDrive.setTargetPosition(leftFrontTarget);
+        rightFrontDrive.setTargetPosition(rightFrontTarget);
+        leftBackDrive.setTargetPosition(leftBackTarget);
+        rightBackDrive.setTargetPosition(rightBackTarget);
 
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -231,16 +246,21 @@ public class DriveTrainMecanum {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         turnSpeed = turn;      // save this value as a class member so it can be used by telemetry.
 
-        leftSpeed = drive - turn;
-        rightSpeed = drive + turn;
+        leftFrontSpeed = drive - turn;
+        leftBackSpeed = drive - turn;
+        rightFrontSpeed = drive + turn;
+        rightBackSpeed = drive - turn;
 
         // Scale speeds down if either one exceeds +/- 1.0;
-        double max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-        if (max > 1.0) {
-            leftSpeed /= max;
-            rightSpeed /= max;
+        double maxLeft = Math.max(Math.abs(leftFrontSpeed), Math.abs(leftBackSpeed));
+        double maxRight = Math.max(Math.abs(rightFrontSpeed), Math.abs(rightBackSpeed));
+        if (maxLeft > 1.0 || maxRight > 1.0) {
+            leftFrontSpeed /= maxLeft;
+            leftBackSpeed /= maxLeft;
+            rightFrontSpeed /= maxLeft;
+            rightBackSpeed /= maxLeft;
         }
-        telemetry.addData("LeftSpeed",leftSpeed); telemetry.addData("RightSpeed",rightSpeed);
+        telemetry.addData("LeftFrontSpeed",leftFrontSpeed); telemetry.addData("LeftBackSpeed",leftBackSpeed); telemetry.addData("rightFrontSpeed",rightFrontSpeed); telemetry.addData("RightBackSpeed",rightBackSpeed);
         // Wheel power for testing
         leftFrontDrive.setPower(0.1);
         rightFrontDrive.setPower(0.1);
@@ -273,7 +293,7 @@ public class DriveTrainMecanum {
 
         if (straight) {
             telemetry.addData("Motion", "Drive Straight");
-            telemetry.addData("Target Pos L:R", "%7d:%7d", leftTarget, rightTarget);
+            telemetry.addData("Target Pos L:R", "%7d:%7d", leftFrontTarget, leftBackTarget, rightFrontTarget, rightBackTarget);
             telemetry.addData("Actual Pos L:R", "%7d:%7d:%7d:%7d", leftFrontDrive.getCurrentPosition(),
                     rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
         } else {
@@ -282,7 +302,7 @@ public class DriveTrainMecanum {
 
         telemetry.addData("Heading- Target : Current", "%5.2f : %5.0f", targetHeading, getHeading());
         telemetry.addData("Error  : Steer Pwr", "%5.1f : %5.1f", headingError, turnSpeed);
-        telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", leftSpeed, rightSpeed);
+        telemetry.addData("Wheel Speeds LF : LB : RF : RB", "%5.2f : %5.2f : %5.2f : %5.2f", leftFrontSpeed, leftBackSpeed, rightFrontSpeed, rightBackSpeed);
         telemetry.update();
     }
 
