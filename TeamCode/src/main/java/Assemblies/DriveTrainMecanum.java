@@ -242,6 +242,59 @@ public class DriveTrainMecanum {
 
     }
 
+    public void driveIndividual(double maxDriveSpeed,
+                              double distanceLeftFront,
+                              double distanceLeftBack,
+                              double distanceRightFront,
+                              double distanceRightBack,
+                              double heading) {
+
+        // Determine new target position, and pass to motor controller
+        int moveCountsLeftFront  = (int) (distanceLeftFront * COUNTS_PER_INCH);
+        int moveCountsLeftBack   = (int) (distanceLeftBack * COUNTS_PER_INCH);
+        int moveCountsRightFront = (int) (distanceRightFront * COUNTS_PER_INCH);
+        int moveCountsRightBack  = (int) (distanceRightBack * COUNTS_PER_INCH);
+        leftFrontTarget = leftFrontDrive.getCurrentPosition() + moveCountsLeftFront;
+        leftBackTarget = leftBackDrive.getCurrentPosition() + moveCountsLeftBack;
+        rightFrontTarget = rightFrontDrive.getCurrentPosition() + moveCountsRightFront;
+        rightBackTarget = rightBackDrive.getCurrentPosition() + moveCountsRightBack;
+
+        // Set Target FIRST, then turn on RUN_TO_POSITION
+        // If Strafing then reverse motor directions
+
+
+        leftFrontDrive.setTargetPosition(leftFrontTarget);
+        rightFrontDrive.setTargetPosition(rightFrontTarget);
+        leftBackDrive.setTargetPosition(leftBackTarget);
+        rightBackDrive.setTargetPosition(rightBackTarget);
+
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+        // Start driving straight, and then enter the control loop
+        maxDriveSpeed = Math.abs(maxDriveSpeed);
+        moveRobot(maxDriveSpeed, 0);
+
+        // keep looping while we are still active, and BOTH motors are running.
+        while ((leftFrontDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy() && leftBackDrive.isBusy())) {
+
+            // Determine required steering to keep on heading
+            turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+            // if driving in reverse, the motor correction also needs to be reversed
+            if (distanceLeftFront < 0 || distanceLeftBack < 0 || distanceRightFront < 0 || distanceRightBack < 0)
+                turnSpeed *= -1.0;
+
+            // Apply the turning correction to the current driving speed.
+            moveRobot(driveSpeed, turnSpeed);
+        }
+
+    }
+
     public void moveRobot(double drive, double turn) {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         turnSpeed = turn;      // save this value as a class member so it can be used by telemetry.

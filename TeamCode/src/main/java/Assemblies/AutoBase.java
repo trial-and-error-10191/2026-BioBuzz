@@ -35,7 +35,9 @@ public class AutoBase {
                 telemetry.addData("In for loop", "");
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100) {
-                    robot.driveTrain.driveStraight(1, desiredNectarDist + 2, robot.driveTrain.getHeading());
+                    robot.driveTrain.driveIndividual(1, desiredNectarDist + 2,
+                            desiredNectarDist + 2, desiredNectarDist + 2,
+                            desiredNectarDist + 2, robot.driveTrain.getHeading());
                 }
                 if (circleFit.getX() > 200) {
                     robot.driveTrain.turnToHeading(1, 10);
