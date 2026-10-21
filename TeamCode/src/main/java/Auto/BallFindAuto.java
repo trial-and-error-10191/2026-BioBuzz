@@ -13,9 +13,8 @@ public class BallFindAuto extends LinearOpMode {
         robot.ballDiff.FindBalls();
         waitForStart();
         while (opModeIsActive()) {
-//            robot.autoBase.ballFindUpdate(robot.ballDiff);
-//            robot.autoBase.closeBallTarget(robot, true);
-            robot.driveTrain.driveIndividual(1, 50, 50, 50, 50, 0);
+            robot.autoBase.ballFindUpdate(robot.ballDiff);
+            robot.autoBase.closeBallTarget(robot, true);
         }
     }
 }

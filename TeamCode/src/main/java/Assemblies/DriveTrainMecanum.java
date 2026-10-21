@@ -18,6 +18,7 @@ public class DriveTrainMecanum {
     double angles = 0;
     private IMU imu = null;
     private ElapsedTime runtime = new ElapsedTime();
+    long start = System.nanoTime();
 
     Telemetry telemetry;
 
@@ -239,7 +240,74 @@ public class DriveTrainMecanum {
             // Apply the turning correction to the current driving speed.
             moveRobot(driveSpeed, turnSpeed);
         }
+    }
 
+    public void drivePowerForward(double driveSpeed, double time) {
+
+        // Determine new target position, and pass to motor controller
+        double leftFrontPower = -driveSpeed;
+        double leftBackPower = -driveSpeed;
+        double rightFrontPower = -driveSpeed;
+        double rightBackPower = -driveSpeed;
+
+
+        double max;
+
+        // All code below this comment normalizes the values so no wheel power exceeds 100%.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+
+        if (max > 1.0) {
+            leftFrontPower /= max; // leftFrontPower = leftFrontPower / max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        start = System.nanoTime();
+        // keep looping while we are still active, and BOTH motors are running.
+        while (System.nanoTime() - start < time * 1E9) {
+            leftFrontDrive.setPower(leftFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            rightBackDrive.setPower(rightBackPower);
+        }
+    }
+
+    public void drivePowerTurn(double driveSpeed, double time ) {
+
+        // Determine new target position, and pass to motor controller
+        double leftFrontPower = driveSpeed;
+        double leftBackPower = driveSpeed;
+        double rightFrontPower = -driveSpeed;
+        double rightBackPower = -driveSpeed;
+
+
+        double max;
+
+        // All code below this comment normalizes the values so no wheel power exceeds 100%.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+
+        if (max > 1.0) {
+            leftFrontPower /= max; // leftFrontPower = leftFrontPower / max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        start = System.nanoTime();
+        // keep looping while we are still active, and BOTH motors are running.
+        while (System.nanoTime() - start < time * 1E9) {
+            leftFrontDrive.setPower(leftFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            rightBackDrive.setPower(rightBackPower);
+        }
     }
 
     public void driveIndividual(double maxDriveSpeed,

@@ -28,36 +28,33 @@ public class AutoBase {
             desiredNectarDist = robot.ballDiff.ballDistInchBlue;
             desiredBlobs = robot.ballDiff.blobsBlue;
         }
-        robot.driveTrain.encoderSettings();
-        if (desiredNectarDist < robot.ballDiff.ballDistInchPollen) {
+        if (desiredNectarDist < robot.ballDiff.ballDistInchPollen || (robot.ballDiff.blobsYellow.isEmpty() && desiredNectarDist > 0)) {
             telemetry.addData("in first if statement", "");
             for (ColorBlobLocatorProcessor.Blob b : desiredBlobs) {
                 telemetry.addData("In for loop", "");
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100) {
-                    robot.driveTrain.driveIndividual(1, desiredNectarDist + 2,
-                            desiredNectarDist + 2, desiredNectarDist + 2,
-                            desiredNectarDist + 2, robot.driveTrain.getHeading());
+                    robot.driveTrain.drivePowerForward(0.7, 3);
                 }
                 if (circleFit.getX() > 200) {
-                    robot.driveTrain.turnToHeading(1, 10);
+                    robot.driveTrain.drivePowerTurn(0.7, 0.5);
                 } else if (circleFit.getX() < 100) {
-                    robot.driveTrain.turnToHeading(1, -10);
+                    robot.driveTrain.drivePowerTurn(-0.7, 0.5);
                 }
             }
         }
-//        if (robot.ballDiff.ballDistInchPollen < desiredNectarDist) {
-//            for (ColorBlobLocatorProcessor.Blob b : robot.ballDiff.blobsYellow) {
-//                Circle circleFit = b.getCircle();
-//                if (circleFit.getX() <= 200 && circleFit.getX() >= 100) {
-//                    robot.driveTrain.driveStraight(1, robot.ballDiff.ballDistInchPollen + 2, robot.driveTrain.getHeading());
-//                }
-//                if (circleFit.getX() > 200) {
-//                    robot.driveTrain.turnToHeading(1, 10);
-//                } else if (circleFit.getX() < 100) {
-//                    robot.driveTrain.turnToHeading(1, -10);
-//                }
-//            }
-//        }
+        if (robot.ballDiff.ballDistInchPollen < desiredNectarDist || (desiredBlobs.isEmpty() && robot.ballDiff.ballDistInchPollen > 0)) {
+            for (ColorBlobLocatorProcessor.Blob b : robot.ballDiff.blobsYellow) {
+                Circle circleFit = b.getCircle();
+                if (circleFit.getX() <= 200 && circleFit.getX() >= 100) {
+                    robot.driveTrain.drivePowerForward(0.7, 5);
+                }
+                if (circleFit.getX() > 200) {
+                    robot.driveTrain.drivePowerTurn(0.7, 2);
+                } else if (circleFit.getX() < 100) {
+                    robot.driveTrain.drivePowerTurn(-0.7, 2);
+                }
+            }
+        }
     }
 }
