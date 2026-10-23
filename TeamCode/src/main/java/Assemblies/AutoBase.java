@@ -1,8 +1,5 @@
 package Assemblies;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
@@ -18,15 +15,18 @@ public class AutoBase {
         ballDiff.ballDist();
         ballDiff.listUpdate();
     }
-    public void closeBallTarget(Robot robot, boolean nectarRed) {
+    public void closeBallTarget(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         double desiredNectarDist;
         List<ColorBlobLocatorProcessor.Blob> desiredBlobs;
-        if (nectarRed) {
+        if (nectarRedFind && !pollenOnly) {
             desiredNectarDist = robot.ballDiff.ballDistInchRed;
             desiredBlobs = robot.ballDiff.blobsRed;
-        } else {
+        } else if (!nectarRedFind && !pollenOnly) {
             desiredNectarDist = robot.ballDiff.ballDistInchBlue;
             desiredBlobs = robot.ballDiff.blobsBlue;
+        } else {
+            desiredNectarDist = 0;
+            desiredBlobs = robot.ballDiff.blobsYellow;
         }
         if (desiredNectarDist < robot.ballDiff.ballDistInchPollen || (robot.ballDiff.blobsYellow.isEmpty() && desiredNectarDist > 0)) {
             telemetry.addData("in first if statement", "");
@@ -34,12 +34,15 @@ public class AutoBase {
                 telemetry.addData("In for loop", "");
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100) {
-                    robot.driveTrain.drivePowerForward(0.7, 3);
+                    robot.driveTrain.drivePowerForward(0.3, 3);
+                    robot.driveTrain.drivePowerForward(0, 0.5);
                 }
                 if (circleFit.getX() > 200) {
-                    robot.driveTrain.drivePowerTurn(0.7, 0.5);
+                    robot.driveTrain.drivePowerTurn(-0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 } else if (circleFit.getX() < 100) {
-                    robot.driveTrain.drivePowerTurn(-0.7, 0.5);
+                    robot.driveTrain.drivePowerTurn(0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 }
             }
         }

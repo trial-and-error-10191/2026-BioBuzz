@@ -1,7 +1,6 @@
 package Assemblies;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,7 +16,6 @@ public class DriveTrainMecanum {
     DcMotor leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive;
     double angles = 0;
     private IMU imu = null;
-    private ElapsedTime runtime = new ElapsedTime();
     long start = System.nanoTime();
 
     Telemetry telemetry;
@@ -28,14 +26,11 @@ public class DriveTrainMecanum {
     static final double WHEEL_DIAMETER_INCHES = 3.5;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 1;
-    static final double TURN_SPEED = 0.5;
     static final double HEADING_THRESHOLD = 5.0;
     static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable.
     static final double P_DRIVE_GAIN = 0.03;
     private double targetHeading = 0;
     private double driveSpeed = 0;
-    private double strafeSpeed = 0;
     private double turnSpeed = 0;
     private double leftFrontSpeed = 0;
     private double leftBackSpeed = 0;

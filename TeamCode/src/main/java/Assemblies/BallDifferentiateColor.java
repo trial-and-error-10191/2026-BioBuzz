@@ -11,12 +11,18 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
+import org.firstinspires.ftc.vision.opencv.ColorSpace;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 
 public class BallDifferentiateColor {
-
+    ColorRange POLLEN_YELLOW = new ColorRange(
+            ColorSpace.YCrCb,
+            new Scalar(87, 56, 160), // 129
+            new Scalar(145, 49, 152)
+    );
     public double ballDistInchRed,ballDistInchBlue, ballDistInchPollen;
 
     ColorBlobLocatorProcessor colorLocatorRed = new ColorBlobLocatorProcessor.Builder()
@@ -52,7 +58,7 @@ public class BallDifferentiateColor {
             .build();
 
     ColorBlobLocatorProcessor colorLocatorYellow = new ColorBlobLocatorProcessor.Builder()
-            .setTargetColorRange(ColorRange.YELLOW)   // Use a predefined color match
+            .setTargetColorRange(POLLEN_YELLOW)   // Use a predefined color match
             .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
             .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
             .setDrawContours(true)   // Show contours on the Stream Preview
@@ -139,9 +145,6 @@ public class BallDifferentiateColor {
             telemetry.addData("Red nectar distance away from cam (inches)", ballDistInchRed);
             telemetry.addData("Blue nectar distance away from cam (inches)", ballDistInchBlue);
             telemetry.addData("Pollen distance away from cam (inches)", ballDistInchPollen);
-//            telemetry.addData("Red nectar amount", colorLocatorRed.getBlobs().size());
-//            telemetry.addData("Blue nectar amount", colorLocatorBlue.getBlobs().size());
-//            telemetry.addData("Pollen amount", colorLocatorYellow.getBlobs().size());
             for (ColorBlobLocatorProcessor.Blob b : blobsRed) {
                 Circle circleFit = b.getCircle();
                 telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
