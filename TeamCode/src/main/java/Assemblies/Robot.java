@@ -6,10 +6,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Robot {
     public DriveTrainMecanum driveTrain;
-    public LaunchWheels launchWheels;
+    public LaunchWheels wheels;
     public Robot(HardwareMap hwMap, Telemetry telemetry) {
         driveTrain = new DriveTrainMecanum(hwMap, telemetry);
-        launchWheels = new LaunchWheels(hwMap, telemetry);
+        wheels = new LaunchWheels(hwMap, telemetry);
     }
 }
 

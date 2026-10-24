@@ -1,6 +1,5 @@
 package Assemblies;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -42,15 +41,24 @@ public class LaunchWheels {
         // Reverse the wheels to obtain the desired direction
         launchMotor.setDirection(DcMotor.Direction.FORWARD);
 
+        cataclysmicError = (Math.abs(currentRPM) / rpmTarget * 100) > 20;
     }
 
     /**
      * performs the wheel logic every iteration
      */
     public void wheelsTick() {
-
         // Wait to get accurate RPM
         if (runTime.milliseconds() > lastKnownMS + 80) {
+
+            // Set initial power equalization's
+            if (!(currentRPM > rpmTarget - rpmLeniency && currentRPM < rpmTarget + rpmLeniency)) {
+                power += currentRPM > rpmTarget + rpmLeniency ? -changeBy * ((Math.abs(currentRPM - rpmTarget)) / 10) : 0;
+                power += currentRPM < rpmTarget - rpmLeniency ? changeBy * ((Math.abs(currentRPM - rpmTarget)) / 10) : 0;
+                power = Math.max(-1, Math.min(1, power));
+            }
+
+            launchMotor.setPower(power);
 
             currentRPM =  (((launchMotor.getCurrentPosition() - lastKnownEnc) / encodersPerRevolution) * (60000 / (runTime.milliseconds() - lastKnownMS)));
 
@@ -68,8 +76,8 @@ public class LaunchWheels {
     }
 
     /**
-     * retrieve the left rpm
-     * @return the left rpm
+     * retrieve the rpm
+     * @return the rpm
      */
     public double rpm() {
         return currentRPM;
