@@ -12,9 +12,7 @@ public class AprilTagFindDist extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
-            robot.aprilTagCenter.findTagDist(robot.camDef.aprilTag);
-            telemetry.addData("Average Distance", robot.aprilTagCenter.averageDist);
-            telemetry.update();
+            robot.aprilTagCenter.findClusterDist(robot.camDef.aprilTag);
         }
     }
 }

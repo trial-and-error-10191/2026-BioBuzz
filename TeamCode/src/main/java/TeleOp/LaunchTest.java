@@ -11,9 +11,7 @@ public class LaunchTest extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
-            robot.driveTrain.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-            robot.wheels.rpmReset(2950);
-            robot.wheels.wheelsTick();
+            robot.launchByAprilTags();
         }
     }
 }
