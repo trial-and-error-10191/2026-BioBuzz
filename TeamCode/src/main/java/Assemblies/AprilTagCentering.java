@@ -9,6 +9,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 import java.util.List;
 
 public class AprilTagCentering {
+    double distAwayFromTags;
     Telemetry telemetry;
 
     public AprilTagCentering (AprilTagProcessor aprilTag, Telemetry telemetry) {
@@ -23,10 +24,10 @@ public class AprilTagCentering {
     }
 
     public double findClusterDist(AprilTagProcessor aprilTag, char desiredChar) {
-        double distAwayFromTags = 0;
+        distAwayFromTags = 0;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         singleTagDetect(currentDetections);
-        clusterTagDetect(currentDetections, desiredChar, distAwayFromTags);
+        clusterTagDetect(currentDetections, desiredChar);
         return distAwayFromTags;
     }
     public void singleTagDetect(List<AprilTagDetection> currentDetections) {
@@ -53,14 +54,14 @@ public class AprilTagCentering {
         }
         return killSwitch;
     }
-    public void clusterTagDetect(List<AprilTagDetection> currentDetections, char desiredChar, double clusterDist) {
+    public void clusterTagDetect(List<AprilTagDetection> currentDetections, char desiredChar) {
         for (AprilTagDetection detection : currentDetections) {
             if (detection instanceof AprilTagClusterDetection) {
                 AprilTagClusterDetection clusterDet = (AprilTagClusterDetection) detection;
                 if (aprilTagClusterFilter(clusterDet, desiredChar) == 1) {
                     continue;
                 }
-                clusterDist = clusterDet.ftcPose.range;
+                distAwayFromTags = clusterDet.ftcPose.range;
                 telemetry.addData("Cluster Amount", clusterDet.percentClusterFound);
                 telemetry.addData("Cluster Range", clusterDet.ftcPose.range);
                 telemetry.addData("Cluster Name", clusterDet.metadata.name);
