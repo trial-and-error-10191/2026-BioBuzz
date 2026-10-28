@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-//@Disabled
+@Disabled
 public class LaunchWheels {
 
     // Define wheels

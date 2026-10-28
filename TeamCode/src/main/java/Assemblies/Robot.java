@@ -18,15 +18,15 @@ public class Robot {
         wheels = new LaunchWheels(hwMap, telemetry);
         this.telemetry = telemetry;
     }
-    public void launchByAprilTags() {
-        if (aprilTagCenter.findClusterDist(camDef.aprilTag) > 60) {
+    public void launchByAprilTags(char desiredChar) {
+        if (aprilTagCenter.findClusterDist(camDef.aprilTag, desiredChar) > 60) {
             wheels.launchMotor.setPower(0.1);
-        } else if (aprilTagCenter.findClusterDist(camDef.aprilTag) <= 60 && aprilTagCenter.findClusterDist(camDef.aprilTag) >= 20) {
+        } else if (aprilTagCenter.findClusterDist(camDef.aprilTag, desiredChar) <= 60 && aprilTagCenter.findClusterDist(camDef.aprilTag, desiredChar) >= 20) {
             wheels.launchMotor.setPower(0.3);
-        } else if (aprilTagCenter.findClusterDist(camDef.aprilTag) < 20) {
+        } else if (aprilTagCenter.findClusterDist(camDef.aprilTag, desiredChar) < 20) {
             wheels.launchMotor.setPower(0.5);
         }
-        telemetry.addData("Cluster Distance", aprilTagCenter.findClusterDist(camDef.aprilTag));
+        telemetry.addData("Cluster Distance", aprilTagCenter.findClusterDist(camDef.aprilTag, desiredChar));
         telemetry.addData("Launch Power", wheels.launchMotor.getPower());
         telemetry.update();
     }

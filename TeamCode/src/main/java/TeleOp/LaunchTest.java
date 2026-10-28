@@ -11,7 +11,7 @@ public class LaunchTest extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
-            robot.launchByAprilTags();
+            robot.launchByAprilTags('B');
         }
     }
 }

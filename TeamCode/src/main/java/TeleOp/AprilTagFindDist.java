@@ -12,7 +12,8 @@ public class AprilTagFindDist extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
-            robot.aprilTagCenter.findClusterDist(robot.camDef.aprilTag);
+            telemetry.addData("April Tag Cluster Distance", robot.aprilTagCenter.findClusterDist(robot.camDef.aprilTag, 'B'));
+            telemetry.update();
         }
     }
 }
