@@ -10,6 +10,7 @@ public class BallFindAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         Robot robot = new Robot(hardwareMap, telemetry);
+        robot.ballDiff.locateNectAndOrPol(true, false, robot.ballDiff.colorLocatorBlue);
         robot.ballDiff.FindBalls();
         waitForStart();
         while (opModeIsActive()) {

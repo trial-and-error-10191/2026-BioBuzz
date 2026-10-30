@@ -10,6 +10,7 @@ public class NectarDetectTest extends LinearOpMode {
     @Override
     public void runOpMode () {
         BallDifferentiateColor ballDiff = new BallDifferentiateColor(hardwareMap, telemetry);
+        ballDiff.locateNectAndOrPol(true, false, ballDiff.colorLocatorBlue);
         ballDiff.FindBalls();
         waitForStart();
         while (opModeIsActive()) {

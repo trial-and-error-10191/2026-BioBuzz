@@ -20,12 +20,12 @@ import java.util.List;
 public class BallDifferentiateColor {
     ColorRange POLLEN_YELLOW = new ColorRange(
             ColorSpace.YCrCb,
-            new Scalar(87, 56, 160), // 129
-            new Scalar(145, 49, 152)
+            new Scalar(32, 100, 30),
+            new Scalar(255, 160, 56)
     );
     public double ballDistInchRed,ballDistInchBlue, ballDistInchPollen;
 
-    ColorBlobLocatorProcessor colorLocatorRed = new ColorBlobLocatorProcessor.Builder()
+    public ColorBlobLocatorProcessor colorLocatorRed = new ColorBlobLocatorProcessor.Builder()
             .setTargetColorRange(ColorRange.RED)   // Use a predefined color match
             .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
             .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
@@ -41,7 +41,7 @@ public class BallDifferentiateColor {
 
             .build();
 
-    ColorBlobLocatorProcessor colorLocatorBlue = new ColorBlobLocatorProcessor.Builder()
+    public ColorBlobLocatorProcessor colorLocatorBlue = new ColorBlobLocatorProcessor.Builder()
             .setTargetColorRange(ColorRange.BLUE)   // Use a predefined color match
             .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
             .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
@@ -57,7 +57,7 @@ public class BallDifferentiateColor {
 
             .build();
 
-    ColorBlobLocatorProcessor colorLocatorYellow = new ColorBlobLocatorProcessor.Builder()
+    public ColorBlobLocatorProcessor colorLocatorYellow = new ColorBlobLocatorProcessor.Builder()
             .setTargetColorRange(POLLEN_YELLOW)   // Use a predefined color match
             .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
             .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
@@ -85,11 +85,21 @@ public class BallDifferentiateColor {
     public BallDifferentiateColor(HardwareMap hwMap, Telemetry telemetry) {
         // Create the vision portal by using a builder.
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
-        builder.setCameraResolution(new Size(320, 240));
         builder.addProcessors(colorLocatorRed, colorLocatorBlue, colorLocatorYellow);
+        builder.setCameraResolution(new Size(320, 240));
         visionPortal = builder.build();
 
         this.telemetry = telemetry;
+    }
+
+    public void locateNectAndOrPol(boolean findAll, boolean nectOnly, ColorBlobLocatorProcessor desiredProcessor) {
+//        if (findAll) {
+//            builder.addProcessors(colorLocatorRed, colorLocatorBlue, colorLocatorYellow);
+//        } if (nectOnly) {
+//            builder.addProcessors(colorLocatorYellow, desiredProcessor);
+//        } if (!nectOnly && !findAll) {
+//            builder.addProcessor(colorLocatorYellow);
+//        }
     }
 
     public void listUpdate() {

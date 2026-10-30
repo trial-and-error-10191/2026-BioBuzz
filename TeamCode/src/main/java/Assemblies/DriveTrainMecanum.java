@@ -100,6 +100,53 @@ public class DriveTrainMecanum {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void tankBotSettings() {
+        // Initializes motor directions:
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+    }
+
+    public void driveTank(double axial, double yaw) {
+        tankBotSettings();
+
+        // initializes deadzone
+        double deadzone = 0.05;
+        // initializes sensitivity
+        double sensitivity = 0.75;
+
+        double leftPower = 0;
+        double rightPower = 0;
+
+        if (Math.abs(axial) > deadzone || Math.abs(yaw) > deadzone) {
+            leftPower = axial + yaw;
+            rightPower = axial - yaw;
+        }
+        double max;
+
+        // All code below this comment normalizes the values so no wheel power exceeds 100%.
+        max = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+
+
+        if (max > 1.0) {
+            leftPower /= max; // leftFrontPower = leftFrontPower / max;
+            rightPower /= max;
+        }
+
+        // Calculates power using sensitivity variable.
+        leftPower *= sensitivity;
+        rightPower *= sensitivity;
+
+        //leftFrontPower *= 0.7; // this motor is 312 rpm, others are 223. 223/312 ~ 0.7
+
+        // The next four lines gives the calculated power to each motor.
+        leftFrontDrive.setPower(leftPower);
+        rightFrontDrive.setPower(rightPower);
+        leftBackDrive.setPower(leftPower);
+        rightBackDrive.setPower(rightPower);
+    }
+
     public void fieldOrientedAuto(double axial, double lateral, double yaw) {
         double sensitivity = 0.65;        // initializes sensitivity
         double max;                       // use for max power to wheels
