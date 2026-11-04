@@ -18,12 +18,14 @@ import org.opencv.core.Scalar;
 import java.util.List;
 
 public class BallDifferentiateColor {
+    double lastBallDist = 0;
+    int ballAmount = 0;
     ColorRange POLLEN_YELLOW = new ColorRange(
             ColorSpace.YCrCb,
-            new Scalar(32, 100, 30),
-            new Scalar(255, 160, 56)
+            new Scalar(32, 60, 30),
+            new Scalar(255, 160, 76)
     );
-    public double ballDistInchRed,ballDistInchBlue, ballDistInchPollen;
+    public double ballDistInchRed, ballDistInchBlue, ballDistInchPollen;
 
     public ColorBlobLocatorProcessor colorLocatorRed = new ColorBlobLocatorProcessor.Builder()
             .setTargetColorRange(ColorRange.RED)   // Use a predefined color match
@@ -85,21 +87,20 @@ public class BallDifferentiateColor {
     public BallDifferentiateColor(HardwareMap hwMap, Telemetry telemetry) {
         // Create the vision portal by using a builder.
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
-        builder.addProcessors(colorLocatorRed, colorLocatorBlue, colorLocatorYellow);
         builder.setCameraResolution(new Size(320, 240));
-        visionPortal = builder.build();
 
         this.telemetry = telemetry;
     }
 
     public void locateNectAndOrPol(boolean findAll, boolean nectOnly, ColorBlobLocatorProcessor desiredProcessor) {
-//        if (findAll) {
-//            builder.addProcessors(colorLocatorRed, colorLocatorBlue, colorLocatorYellow);
-//        } if (nectOnly) {
-//            builder.addProcessors(colorLocatorYellow, desiredProcessor);
-//        } if (!nectOnly && !findAll) {
-//            builder.addProcessor(colorLocatorYellow);
-//        }
+        if (findAll) {
+            builder.addProcessors(colorLocatorRed, colorLocatorBlue, colorLocatorYellow);
+        } if (nectOnly) {
+            builder.addProcessors(colorLocatorYellow, desiredProcessor);
+        } if (!nectOnly && !findAll) {
+            builder.addProcessor(colorLocatorYellow);
+        }
+        visionPortal = builder.build();
     }
 
     public void listUpdate() {
@@ -146,6 +147,30 @@ public class BallDifferentiateColor {
         for (ColorBlobLocatorProcessor.Blob b : blobsYellow) {
             Circle circleFit = b.getCircle();
             ballDistInchPollen = Math.pow(Math.E, -0.0346 * circleFit.getRadius()) * 91;
+        }
+    }
+
+    public void ballCount(boolean nectarRedFind, boolean pollenOnly) {
+        double desiredNectarDist = 0;
+        List<ColorBlobLocatorProcessor.Blob> desiredBlobs = blobsYellow;
+        if (nectarRedFind && !pollenOnly) {
+            desiredNectarDist = ballDistInchRed;
+            desiredBlobs = blobsRed;
+        } else if (!nectarRedFind && !pollenOnly) {
+            desiredNectarDist = ballDistInchBlue;
+            desiredBlobs = blobsBlue;
+        }
+        if (pollenOnly || (ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 3 || (desiredBlobs.isEmpty() && ballDistInchPollen > 0))) {
+            lastBallDist = ballDistInchPollen;
+            if (lastBallDist > ballDistInchPollen && ballDistInchPollen == 0) {
+                ballAmount++;
+            }
+        }
+        if (desiredNectarDist < ballDistInchPollen && desiredNectarDist <= 3 || (blobsYellow.isEmpty() && desiredNectarDist > 0)) {
+            lastBallDist = desiredNectarDist;
+            if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
+                ballAmount++;
+            }
         }
     }
 

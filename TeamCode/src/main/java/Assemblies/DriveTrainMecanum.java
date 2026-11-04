@@ -147,45 +147,6 @@ public class DriveTrainMecanum {
         rightBackDrive.setPower(rightPower);
     }
 
-    public void fieldOrientedAuto(double axial, double lateral, double yaw) {
-        double sensitivity = 0.65;        // initializes sensitivity
-        double max;                       // use for max power to wheels
-
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        angles = -orientation.getYaw(AngleUnit.RADIANS);
-
-        double robotForward = -axial * Math.cos(angles) + lateral * Math.sin(angles);
-        double robotStrafe = lateral * Math.cos(angles) - -axial * Math.sin(angles);
-
-        double leftFrontPower = 0;
-        double rightFrontPower = 0;
-        double leftBackPower = 0;
-        double rightBackPower = 0;
-
-        leftFrontPower = robotForward + robotStrafe + yaw;
-        rightFrontPower = robotForward - robotStrafe - yaw;
-        leftBackPower = robotForward - robotStrafe + yaw;
-        rightBackPower = robotForward + robotStrafe - yaw;
-
-        // All code below this comment normalizes the values so no wheel power exceeds 100%.
-        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // The next four lines gives the calculated power to each motor.
-        leftFrontDrive.setPower(leftFrontPower * sensitivity);
-        rightFrontDrive.setPower(rightFrontPower * sensitivity);
-        leftBackDrive.setPower(leftBackPower * sensitivity);
-        rightBackDrive.setPower(rightBackPower * sensitivity);
-    }
-
     public void drive(double axial, double lateral, double yaw) {
 
         // initializes deadzone
@@ -351,60 +312,6 @@ public class DriveTrainMecanum {
             rightBackDrive.setPower(rightBackPower);
         }
     }
-
-    public void driveIndividual(double maxDriveSpeed,
-                              double distanceLeftFront,
-                              double distanceLeftBack,
-                              double distanceRightFront,
-                              double distanceRightBack,
-                              double heading) {
-
-        // Determine new target position, and pass to motor controller
-        int moveCountsLeftFront  = (int) (distanceLeftFront * COUNTS_PER_INCH);
-        int moveCountsLeftBack   = (int) (distanceLeftBack * COUNTS_PER_INCH);
-        int moveCountsRightFront = (int) (distanceRightFront * COUNTS_PER_INCH);
-        int moveCountsRightBack  = (int) (distanceRightBack * COUNTS_PER_INCH);
-        leftFrontTarget = leftFrontDrive.getCurrentPosition() + moveCountsLeftFront;
-        leftBackTarget = leftBackDrive.getCurrentPosition() + moveCountsLeftBack;
-        rightFrontTarget = rightFrontDrive.getCurrentPosition() + moveCountsRightFront;
-        rightBackTarget = rightBackDrive.getCurrentPosition() + moveCountsRightBack;
-
-        // Set Target FIRST, then turn on RUN_TO_POSITION
-        // If Strafing then reverse motor directions
-
-
-        leftFrontDrive.setTargetPosition(leftFrontTarget);
-        rightFrontDrive.setTargetPosition(rightFrontTarget);
-        leftBackDrive.setTargetPosition(leftBackTarget);
-        rightBackDrive.setTargetPosition(rightBackTarget);
-
-
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // Set the required driving speed  (must be positive for RUN_TO_POSITION)
-        // Start driving straight, and then enter the control loop
-        maxDriveSpeed = Math.abs(maxDriveSpeed);
-        moveRobot(maxDriveSpeed, 0);
-
-        // keep looping while we are still active, and BOTH motors are running.
-        while ((leftFrontDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy() && leftBackDrive.isBusy())) {
-
-            // Determine required steering to keep on heading
-            turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-            // if driving in reverse, the motor correction also needs to be reversed
-            if (distanceLeftFront < 0 || distanceLeftBack < 0 || distanceRightFront < 0 || distanceRightBack < 0)
-                turnSpeed *= -1.0;
-
-            // Apply the turning correction to the current driving speed.
-            moveRobot(driveSpeed, turnSpeed);
-        }
-
-    }
-
     public void moveRobot(double drive, double turn) {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         turnSpeed = turn;      // save this value as a class member so it can be used by telemetry.
@@ -427,14 +334,6 @@ public class DriveTrainMecanum {
         // Wheel power for testing
         leftFrontDrive.setPower(0.1);
         rightFrontDrive.setPower(0.1);
-//        leftBackDrive.setPower(0.1);
-//        rightBackDrive.setPower(0.1);
-
-        // Actual wheel power that'll be used at competitions
-//        leftFrontDrive.setPower(leftSpeed * 0.85);
-//        rightFrontDrive.setPower(rightSpeed);
-//        leftBackDrive.setPower(leftSpeed);
-//        rightBackDrive.setPower(rightSpeed);
     }
 
     public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
@@ -450,25 +349,6 @@ public class DriveTrainMecanum {
         // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
         return Range.clip(headingError * proportionalGain, -1, 1);
     }
-
-
-    private void sendTelemetry(boolean straight) {
-
-        if (straight) {
-            telemetry.addData("Motion", "Drive Straight");
-            telemetry.addData("Target Pos L:R", "%7d:%7d", leftFrontTarget, leftBackTarget, rightFrontTarget, rightBackTarget);
-            telemetry.addData("Actual Pos L:R", "%7d:%7d:%7d:%7d", leftFrontDrive.getCurrentPosition(),
-                    rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
-        } else {
-            telemetry.addData("Motion", "Turning");
-        }
-
-        telemetry.addData("Heading- Target : Current", "%5.2f : %5.0f", targetHeading, getHeading());
-        telemetry.addData("Error  : Steer Pwr", "%5.1f : %5.1f", headingError, turnSpeed);
-        telemetry.addData("Wheel Speeds LF : LB : RF : RB", "%5.2f : %5.2f : %5.2f : %5.2f", leftFrontSpeed, leftBackSpeed, rightFrontSpeed, rightBackSpeed);
-        telemetry.update();
-    }
-
     public void turnToHeading(double maxTurnSpeed, double heading) {
 
         // Run getSteeringCorrection() once to pre-calculate the current error
