@@ -3,7 +3,6 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -108,6 +107,34 @@ public class DriveTrainMecanum {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
     }
 
+    public void driveTankForward(double driveSpeed, double time) {
+        tankBotSettings();// Determine new target position, and pass to motor controller
+
+        double leftPower = -driveSpeed;
+        double rightPower = -driveSpeed;
+
+
+        double max;
+
+        // All code below this comment normalizes the values so no wheel power exceeds 100%.
+        max = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+
+
+        if (max > 1.0) {
+            leftPower /= max; // leftPower = leftPower / max;
+            rightPower /= max;
+        }
+
+        start = System.nanoTime();
+        // keep looping while we are still active, and BOTH motors are running.
+        while (System.nanoTime() - start < time * 1E9) {
+            leftFrontDrive.setPower(leftPower);
+            leftBackDrive.setPower(leftPower);
+//            rightFrontDrive.setPower(rightPower);
+            rightBackDrive.setPower(rightPower);
+        }
+    }
+
     public void driveTank(double axial, double yaw) {
         tankBotSettings();
 
@@ -142,9 +169,39 @@ public class DriveTrainMecanum {
 
         // The next four lines gives the calculated power to each motor.
         leftFrontDrive.setPower(leftPower);
-        rightFrontDrive.setPower(rightPower);
+//        rightFrontDrive.setPower(rightPower);
         leftBackDrive.setPower(leftPower);
         rightBackDrive.setPower(rightPower);
+    }
+
+    public void driveTankTurn(double driveSpeed, double time) {
+        tankBotSettings();
+
+
+        // Determine new target position
+        double leftPower = driveSpeed;
+        double rightPower = -driveSpeed;
+
+
+        double max;
+
+        // All code below this comment normalizes the values so no wheel power exceeds 100%.
+        max = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+
+
+        if (max > 1.0) {
+            leftPower /= max; // leftFrontPower = leftFrontPower / max;
+            rightPower /= max;
+        }
+
+        start = System.nanoTime();
+        // keep looping while we are still active, and BOTH motors are running.
+        while (System.nanoTime() - start < time * 1E9) {
+            leftFrontDrive.setPower(leftPower);
+            leftBackDrive.setPower(leftPower);
+            rightFrontDrive.setPower(rightPower);
+            rightBackDrive.setPower(rightPower);
+        }
     }
 
     public void drive(double axial, double lateral, double yaw) {
