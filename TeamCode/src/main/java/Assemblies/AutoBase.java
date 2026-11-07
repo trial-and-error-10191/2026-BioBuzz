@@ -20,7 +20,7 @@ public class AutoBase {
     public void closeBallTarget(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         nectFindSettings(robot, nectarRedFind, pollenOnly);
         ballFindUpdate(robot.ballDiff);
-        ballLocatePollen(robot, pollenOnly);
+        ballLocatePollen(robot, nectarRedFind, pollenOnly);
         pollenDriveTo(robot, pollenOnly);
         nectarDriveTo(robot);
         ballFindStop(robot, nectarRedFind, pollenOnly);
@@ -37,12 +37,19 @@ public class AutoBase {
             desiredBlobs = robot.ballDiff.blobsYellow;
         }
     }
+    public double timeSetToDistance(Robot robot) {
+        robot.ballDiff.ballDist();
+        double timeDrive = 0.0222 * robot.ballDiff.ballDistInchPollen;
+        return timeDrive;
+    }
     public void pollenDriveTo(Robot robot, boolean pollenOnly) {
         if (pollenOnly || (robot.ballDiff.ballDistInchPollen < desiredNectarDist || (desiredBlobs.isEmpty() && robot.ballDiff.ballDistInchPollen > 0))) {
             for (ColorBlobLocatorProcessor.Blob b : robot.ballDiff.blobsYellow) {
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100 && robot.ballDiff.ballDistInchPollen != 0) {
-                    robot.driveTrain.drivePowerForward(0.7, 2);
+                    robot.driveTrain.drivePowerForward(0.5, timeSetToDistance(robot));
+                    robot.driveTrain.drivePowerForward(0, 0.3);
+                    robot.ballDiff.ballAmount++;
                 }
                 if (circleFit.getX() > 200) {
                     robot.driveTrain.drivePowerTurn(0.3, 0.1);
@@ -61,8 +68,8 @@ public class AutoBase {
                 telemetry.addData("In for loop", "");
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100 && desiredNectarDist != 0) {
-                    robot.driveTrain.drivePowerForward(0.3, 3);
-                    robot.driveTrain.drivePowerForward(0, 0.5);
+                    robot.driveTrain.drivePowerForward(0.5, timeSetToDistance(robot));
+                    robot.driveTrain.drivePowerForward(0, 0.3);
                 }
                 if (circleFit.getX() > 200) {
                     robot.driveTrain.drivePowerTurn(0.3, 0.1);
@@ -74,7 +81,7 @@ public class AutoBase {
             }
         }
     }
-    public void ballLocatePollen(Robot robot, boolean pollenOnly) {
+    public void ballLocatePollen(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         ballFindUpdate(robot.ballDiff);
         while (robot.ballDiff.ballDistInchPollen == 0) {
             robot.driveTrain.drivePowerTurn(-0.3, 0.1);
@@ -85,10 +92,9 @@ public class AutoBase {
         }
     }
     public void ballFindStop(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
-        robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
         if (robot.ballDiff.ballAmount >= 4) {
-            robot.ballDiff.ballAmount = 0;
             robot.driveTrain.drivePowerTurn(1, 30);
+            robot.ballDiff.ballAmount = 0;
         }
         telemetry.addData("Balls intaken", robot.ballDiff.ballAmount);
         telemetry.update();
