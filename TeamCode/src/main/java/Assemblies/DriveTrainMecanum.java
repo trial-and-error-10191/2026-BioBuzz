@@ -1,6 +1,7 @@
 package Assemblies;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
@@ -107,6 +108,13 @@ public class DriveTrainMecanum {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
     }
 
+    public void smokeyBotSettings() {
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+    }
+
     public void driveTankForward(double driveSpeed, double time) {
         tankBotSettings();// Determine new target position, and pass to motor controller
 
@@ -205,6 +213,7 @@ public class DriveTrainMecanum {
     }
 
     public void drive(double axial, double lateral, double yaw) {
+        smokeyBotSettings();
 
         // initializes deadzone
         double deadzone = 0.05;
@@ -303,6 +312,7 @@ public class DriveTrainMecanum {
     }
 
     public void drivePowerForward(double driveSpeed, double time) {
+        smokeyBotSettings();
 
         // Determine new target position, and pass to motor controller
         double leftFrontPower = -driveSpeed;
@@ -337,6 +347,7 @@ public class DriveTrainMecanum {
     }
 
     public void drivePowerTurn(double driveSpeed, double time ) {
+        smokeyBotSettings();
 
         // Determine new target position, and pass to motor controller
         double leftFrontPower = driveSpeed;

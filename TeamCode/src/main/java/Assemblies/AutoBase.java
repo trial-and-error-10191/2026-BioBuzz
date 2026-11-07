@@ -20,7 +20,7 @@ public class AutoBase {
     public void closeBallTarget(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         nectFindSettings(robot, nectarRedFind, pollenOnly);
         ballFindUpdate(robot.ballDiff);
-        ballLocatePollen(robot);
+        ballLocatePollen(robot, pollenOnly);
         pollenDriveTo(robot, pollenOnly);
         nectarDriveTo(robot);
         ballFindStop(robot, nectarRedFind, pollenOnly);
@@ -42,14 +42,14 @@ public class AutoBase {
             for (ColorBlobLocatorProcessor.Blob b : robot.ballDiff.blobsYellow) {
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100 && robot.ballDiff.ballDistInchPollen != 0) {
-                    robot.driveTrain.driveTankForward(0.7, 2);
+                    robot.driveTrain.drivePowerForward(0.7, 2);
                 }
                 if (circleFit.getX() > 200) {
-                    robot.driveTrain.driveTankTurn(0.3, 0.1);
-                    robot.driveTrain.driveTankTurn(0, 0.1);
+                    robot.driveTrain.drivePowerTurn(0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 } else if (circleFit.getX() < 100) {
-                    robot.driveTrain.driveTankTurn(-0.3, 0.1);
-                    robot.driveTrain.driveTankTurn(0, 0.1);
+                    robot.driveTrain.drivePowerTurn(-0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 }
             }
         }
@@ -61,32 +61,34 @@ public class AutoBase {
                 telemetry.addData("In for loop", "");
                 Circle circleFit = b.getCircle();
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100 && desiredNectarDist != 0) {
-                    robot.driveTrain.driveTankForward(0.3, 3);
-                    robot.driveTrain.driveTankForward(0, 0.5);
+                    robot.driveTrain.drivePowerForward(0.3, 3);
+                    robot.driveTrain.drivePowerForward(0, 0.5);
                 }
                 if (circleFit.getX() > 200) {
-                    robot.driveTrain.driveTankTurn(0.3, 0.1);
-                    robot.driveTrain.driveTankTurn(0, 0.1);
+                    robot.driveTrain.drivePowerTurn(0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 } else if (circleFit.getX() < 100) {
-                    robot.driveTrain.driveTankTurn(-0.3, 0.1);
-                    robot.driveTrain.driveTankTurn(0, 0.1);
+                    robot.driveTrain.drivePowerTurn(-0.3, 0.1);
+                    robot.driveTrain.drivePowerTurn(0, 0.1);
                 }
             }
         }
     }
-    public void ballLocatePollen(Robot robot) {
+    public void ballLocatePollen(Robot robot, boolean pollenOnly) {
         ballFindUpdate(robot.ballDiff);
         while (robot.ballDiff.ballDistInchPollen == 0) {
-            robot.driveTrain.driveTankTurn(-0.3, 0.1);
-            robot.driveTrain.driveTankTurn(0, 0.1);
+            robot.driveTrain.drivePowerTurn(-0.3, 0.1);
+            robot.driveTrain.drivePowerTurn(0, 0.1);
             ballFindUpdate(robot.ballDiff);
+        } if (robot.ballDiff.ballDistInchPollen != 0) {
+            pollenDriveTo(robot, pollenOnly);
         }
     }
     public void ballFindStop(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
         if (robot.ballDiff.ballAmount >= 4) {
             robot.ballDiff.ballAmount = 0;
-            robot.driveTrain.driveTankTurn(1, 30);
+            robot.driveTrain.drivePowerTurn(1, 30);
         }
         telemetry.addData("Balls intaken", robot.ballDiff.ballAmount);
         telemetry.update();
