@@ -51,13 +51,14 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Pollinator Drivetrain", group="Linear OpMode")
-@Disabled
+//@Disabled
 public class The_Bee_Bot extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
+    private DcMotor intake = null;
 
     @Override
     public void runOpMode() {
@@ -69,6 +70,7 @@ public class The_Bee_Bot extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        intake = hardwareMap.get(DcMotor.class, "spinny_intake");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -80,12 +82,15 @@ public class The_Bee_Bot extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        int aPressCounter = 0;
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
+            double spinnyPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -110,6 +115,24 @@ public class The_Bee_Bot extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
+           // if(gamepad1.a){
+           //     spinnyPower = 1.0;
+           // }
+           // else{
+           //     spinnyPower = 0.0;
+           // }
+
+            if(gamepad1.aWasPressed()){
+                aPressCounter++;
+            }
+
+            if(aPressCounter%2 == 1){
+                spinnyPower = 1.0;
+            }
+            else{
+                spinnyPower = 0.0;
+            }
+            intake.setPower(spinnyPower);
         }
     }
 }
