@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -27,6 +28,8 @@ public class PollinatorTeleOp extends LinearOpMode {
     private double launchMotorPower = 0.7;
     private double launchHelperPower = 0.6;
 
+    private double motorScaling = 0.42;
+
 
     @Override
     public void runOpMode() {
@@ -37,10 +40,16 @@ public class PollinatorTeleOp extends LinearOpMode {
         pollenIntake = hardwareMap.get(Servo.class, "pollen_servo"); // 0
         launchHelper = hardwareMap.get(CRServo.class, "launch_helper"); // 1
 
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        launchMotor.setDirection(DcMotor.Direction.FORWARD);
-        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        launchMotor.setDirection(DcMotor.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        leftDrive.setPower(0.0);
+        rightDrive.setPower(0.0);
+        launchMotor.setPower(0.0);
+        intakeMotor.setPower(0.0);
+        launchHelper.setPower(0.0);
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -90,6 +99,18 @@ public class PollinatorTeleOp extends LinearOpMode {
                 }
                 launchHelperPower = Range.clip(launchHelperPower, -1.0, 1.0);
                 telemetry.addData("Current Launch Helper Power", launchHelperPower);
+            } else if (gamepad1.left_bumper) {
+                telemetry.addData("", "Adjusting scale of motor adjustment");
+                telemetry.addData("", "");
+                telemetry.addData("", "======================================");
+                telemetry.addData("", "");
+                if (gamepad1.dpadUpWasPressed()) {
+                    motorScaling += 0.05;
+                } else if (gamepad1.dpadDownWasPressed()) {
+                    motorScaling -= 0.05;
+                }
+                motorScaling = Range.clip(motorScaling, 0.0, 1.0);
+                telemetry.addData("Current Motor Scaling", motorScaling);
             } else {
                 telemetry.addData("", "Adjust motor powers by holding the respective buttons");
                 telemetry.addData("", "");
@@ -98,10 +119,12 @@ public class PollinatorTeleOp extends LinearOpMode {
                 telemetry.addData("Launch Motors", "Right Trigger (R2)");
                 telemetry.addData("", "");
                 telemetry.addData("Launch Helper", "Right Bumper (R1)");
+                telemetry.addData("", "");
+                telemetry.addData("Drive Motor Balance", "Left Bumper (L1)");
             }
 
             if (Math.abs(gamepad1.left_stick_y) > DEADZONE) {
-                leftDrive.setPower(gamepad1.left_stick_y);
+                leftDrive.setPower(gamepad1.left_stick_y * motorScaling);
             } else {
                 leftDrive.setPower(0.0);
             }

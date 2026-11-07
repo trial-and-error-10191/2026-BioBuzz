@@ -40,6 +40,7 @@ import org.firstinspires.ftc.robotcore.internal.usb.UsbConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
@@ -154,8 +155,8 @@ public class ConceptAprilTag extends LinearOpMode {
             // The following default settings are available to un-comment and edit as needed.
             //.setDrawAxes(true) // Changed in V12.0
             //.setDrawTagOutline(true)
-            //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-            //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+            .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+            .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
             //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
             //.setDrawCubeProjection(false)
 
