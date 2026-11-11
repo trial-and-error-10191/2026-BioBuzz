@@ -151,7 +151,7 @@ public class BallDifferentiateColor {
     }
 
     public void ballCount(boolean nectarRedFind, boolean pollenOnly) {
-        double desiredNectarDist = 0;
+        double desiredNectarDist = 1E10;
         List<ColorBlobLocatorProcessor.Blob> desiredBlobs = blobsYellow;
         if (nectarRedFind && !pollenOnly) {
             desiredNectarDist = ballDistInchRed;
@@ -160,19 +160,17 @@ public class BallDifferentiateColor {
             desiredNectarDist = ballDistInchBlue;
             desiredBlobs = blobsBlue;
         }
-        if (ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 6 || (desiredBlobs.isEmpty() && ballDistInchPollen > 0)) {
+        if (ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 20 || (desiredBlobs.isEmpty() && ballDistInchPollen > 0)) {
             lastBallDist = ballDistInchPollen;
             ballDist();
-            if (lastBallDist > ballDistInchPollen && ballDistInchPollen == 0) {
-                ballAmount++;
-            }
+        } if (lastBallDist > ballDistInchPollen && ballDistInchPollen == 0) {
+            ballAmount++;
         }
         if (desiredNectarDist < ballDistInchPollen && desiredNectarDist <= 3 || (blobsYellow.isEmpty() && desiredNectarDist > 0)) {
             lastBallDist = desiredNectarDist;
             ballDist();
-            if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
-                ballAmount++;
-            }
+        } if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
+            ballAmount++;
         }
     }
 
