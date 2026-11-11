@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -60,6 +61,17 @@ public class The_Bee_Bot extends LinearOpMode {
     private DcMotor rightDrive = null;
     private DcMotor intake = null;
 
+    static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
+    static final int    CYCLE_MS    =   50;     // period of each cycle
+    static final double MAX_POS     =  1.0;     // Maximum rotational position
+    static final double MIN_POS     =  0.6;     // Minimum rotational position
+
+    // Define class members
+    Servo servo;
+    double  position = (MAX_POS - MIN_POS)/2 ; // Start at halfway position
+    boolean rampUp = true;
+
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -83,6 +95,19 @@ public class The_Bee_Bot extends LinearOpMode {
         runtime.reset();
 
         int aPressCounter = 0;
+        int xPressCounter= 0;
+
+        // Connect to servo (Assume Robot Left Hand)
+        // Change the text in quotes to match any servo name on your robot.
+        servo = hardwareMap.get(Servo.class, "pollen_arm");
+
+        // Wait for the start button
+        telemetry.addData(">", "Press Start to scan Servo." );
+        telemetry.update();
+        waitForStart();
+
+
+        // Scan servo till stop pressed.
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -115,12 +140,6 @@ public class The_Bee_Bot extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
-           // if(gamepad1.a){
-           //     spinnyPower = 1.0;
-           // }
-           // else{
-           //     spinnyPower = 0.0;
-           // }
 
             if(gamepad1.aWasPressed()){
                 aPressCounter++;
@@ -133,6 +152,31 @@ public class The_Bee_Bot extends LinearOpMode {
                 spinnyPower = 0.0;
             }
             intake.setPower(spinnyPower);
+
+            if(gamepad1.xWasPressed()){
+                xPressCounter++;
+            }
+
+            // slew the servo, according to the rampUp (direction) variable.
+            if (xPressCounter%2 == 1) {
+              position = MIN_POS;
+            }
+            else{
+               position = MAX_POS;
+            }
+
+            // Display the current value
+            telemetry.addData("Servo Position", "%5.2f", position);
+            telemetry.addData(">", "Press Stop to end test." );
+            telemetry.update();
+
+            // Set the servo to the new position and pause;
+            servo.setPosition(position);
+            sleep(CYCLE_MS);
+            idle();
         }
+        // Signal done;
+        telemetry.addData(">", "Done");
+        telemetry.update();
     }
 }
