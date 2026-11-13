@@ -49,6 +49,7 @@ public class AutoBase {
         while (robot.ballDiff.ballAmount < 4) {
             nectFindSettings(robot, nectarRedFind, pollenOnly);
             ballFindUpdate(robot.ballDiff);
+            Wait(2);
             ballLocatePollen(robot, nectarRedFind, pollenOnly);
             pollenDriveTo(robot, nectarRedFind, pollenOnly);
             nectarDriveTo(robot);
@@ -63,7 +64,7 @@ public class AutoBase {
             desiredNectarDist = robot.ballDiff.ballDistInchBlue;
             desiredBlobs = robot.ballDiff.blobsBlue;
         } else {
-            desiredNectarDist = 0;
+            desiredNectarDist = 1E10;
             desiredBlobs = robot.ballDiff.blobsYellow;
         }
     }
@@ -119,6 +120,7 @@ public class AutoBase {
             robot.driveTrain.drivePowerTurn(0, 0.1);
             ballFindUpdate(robot.ballDiff);
         } if (robot.ballDiff.ballDistInchPollen != 0) {
+            ballFindUpdate(robot.ballDiff);
             pollenDriveTo(robot, nectarRedFind, pollenOnly);
         }
     }
@@ -129,5 +131,10 @@ public class AutoBase {
         }
         telemetry.addData("Balls intaken", robot.ballDiff.ballAmount);
         telemetry.update();
+    }
+    public void Wait(double time) {
+        start = System.nanoTime();
+        while (time * 1E9 < System.nanoTime() - start) {
+        }
     }
 }

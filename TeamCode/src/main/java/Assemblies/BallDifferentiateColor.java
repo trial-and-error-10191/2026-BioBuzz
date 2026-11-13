@@ -160,18 +160,28 @@ public class BallDifferentiateColor {
             desiredNectarDist = ballDistInchBlue;
             desiredBlobs = blobsBlue;
         }
-        if (ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 20 || (desiredBlobs.isEmpty() && ballDistInchPollen > 0)) {
+        ballDist();
+        if ((ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 40 && ballDistInchPollen != 0) || (desiredBlobs.isEmpty() && ballDistInchPollen > 0)) {
             lastBallDist = ballDistInchPollen;
-            ballDist();
-        } if (lastBallDist > ballDistInchPollen && ballDistInchPollen == 0) {
-            ballAmount++;
+//            telemetry.addData("A", "");
         }
+        if (lastBallDist > ballDistInchPollen && ballDistInchPollen <= 35) {
+            ballAmount++;
+//            telemetry.addData("B", "");
+        } else {
+            telemetry.addData("Last Ball Dist", lastBallDist);
+            telemetry.addData("Pollen Dist", ballDistInchPollen);
+        }
+
         if (desiredNectarDist < ballDistInchPollen && desiredNectarDist <= 3 || (blobsYellow.isEmpty() && desiredNectarDist > 0)) {
             lastBallDist = desiredNectarDist;
-            ballDist();
-        } if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
-            ballAmount++;
+//            telemetry.addData("C", "");
         }
+        if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
+            ballAmount++;
+//            telemetry.addData("D", "");
+        }
+        telemetry.update();
     }
 
     public void ShowFindings() {
