@@ -28,7 +28,7 @@ public class PollinatorTeleOp extends LinearOpMode {
     private double launchMotorPower = 0.7;
     private double launchHelperPower = 0.6;
 
-    private double motorScaling = 0.42;
+    private double motorScaling = 1.0;
 
 
     @Override
@@ -114,13 +114,13 @@ public class PollinatorTeleOp extends LinearOpMode {
             } else {
                 telemetry.addData("", "Adjust motor powers by holding the respective buttons");
                 telemetry.addData("", "");
-                telemetry.addData("Intake Motors", "Left Trigger (L2)");
+                telemetry.addData("Drive Motor Balance", "Left Bumper (L1)");
                 telemetry.addData("", "");
-                telemetry.addData("Launch Motors", "Right Trigger (R2)");
+                telemetry.addData("Intake Motors", "Left Trigger (L2)");
                 telemetry.addData("", "");
                 telemetry.addData("Launch Helper", "Right Bumper (R1)");
                 telemetry.addData("", "");
-                telemetry.addData("Drive Motor Balance", "Left Bumper (L1)");
+                telemetry.addData("Launch Motors", "Right Trigger (R2)");
             }
 
             if (Math.abs(gamepad1.left_stick_y) > DEADZONE) {
