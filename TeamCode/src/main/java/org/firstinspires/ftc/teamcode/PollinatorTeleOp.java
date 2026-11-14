@@ -60,9 +60,7 @@ public class PollinatorTeleOp extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            // Hold L2 to adjust intake power
-            // Hold R2 to adjust launch motor power
-            // Hold R1 to adjust launch helper power
+            // Info Display on Driver Hub to inform drive team
             if (gamepad1.left_trigger_pressed) {
                 telemetry.addData("", "Adjusting power of intake motors.");
                 telemetry.addData("", "");
@@ -123,6 +121,7 @@ public class PollinatorTeleOp extends LinearOpMode {
                 telemetry.addData("Launch Motors", "Right Trigger (R2)");
             }
 
+            // Drivetrain control, 1 wheel per stick
             if (Math.abs(gamepad1.left_stick_y) > DEADZONE) {
                 leftDrive.setPower(gamepad1.left_stick_y * motorScaling);
             } else {
@@ -134,6 +133,7 @@ public class PollinatorTeleOp extends LinearOpMode {
                 rightDrive.setPower(0.0);
             }
 
+            // Intake control
             if (gamepad1.aWasPressed()) {
                 intaking = !intaking;
             }
@@ -143,6 +143,7 @@ public class PollinatorTeleOp extends LinearOpMode {
                 intakeMotor.setPower(0.0);
             }
 
+            // Launch control
             if (gamepad1.yWasPressed()) {
                 launching = !launching;
             }
