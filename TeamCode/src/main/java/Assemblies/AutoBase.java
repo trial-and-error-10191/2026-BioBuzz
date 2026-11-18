@@ -47,7 +47,6 @@ public class AutoBase {
     }
     public void closeBallTarget(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         while (robot.ballDiff.ballAmount < 4) {
-            nectFindSettings(robot, nectarRedFind, pollenOnly);
             ballFindUpdate(robot.ballDiff);
             Wait(2);
             ballLocatePollen(robot, nectarRedFind, pollenOnly);
@@ -56,7 +55,8 @@ public class AutoBase {
         }
         ballFindStop(robot, nectarRedFind, pollenOnly);
     }
-    public void nectFindSettings(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
+    public void nectFindSettings(Robot robot, boolean nectarRedFind, boolean pollenOnly, boolean findAll, boolean nectOnly, ColorBlobLocatorProcessor desiredProcessor) {
+        robot.ballDiff.locateNectAndOrPol(findAll, nectOnly, desiredProcessor);
         if (nectarRedFind && !pollenOnly) {
             desiredNectarDist = robot.ballDiff.ballDistInchRed;
             desiredBlobs = robot.ballDiff.blobsRed;
@@ -80,13 +80,16 @@ public class AutoBase {
                 if (circleFit.getX() <= 200 && circleFit.getX() >= 100 && robot.ballDiff.ballDistInchPollen != 0) {
                     forwardBallCheck(robot, 0.5, timeSetToDistance(robot.ballDiff), nectarRedFind, pollenOnly);
                     forwardBallCheck(robot, 0, 0.3, nectarRedFind, pollenOnly);
+                    robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
                 }
                 if (circleFit.getX() > 200) {
                     turnBallCheck(robot, -0.3, 0.1, nectarRedFind, pollenOnly);
                     turnBallCheck(robot, 0, 0.1, nectarRedFind, pollenOnly);
+                    robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
                 } else if (circleFit.getX() < 100) {
                     turnBallCheck(robot,0.3, 0.1, nectarRedFind, pollenOnly);
                     turnBallCheck(robot, 0, 0.1, nectarRedFind, pollenOnly);
+                    robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
                 }
             }
         }
@@ -115,13 +118,12 @@ public class AutoBase {
     }
     public void ballLocatePollen(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         ballFindUpdate(robot.ballDiff);
-        while (robot.ballDiff.ballDistInchPollen == 0) {
+        while (robot.ballDiff.blobsYellow.isEmpty()) {
             robot.driveTrain.drivePowerTurn(-0.3, 0.1);
             robot.driveTrain.drivePowerTurn(0, 0.1);
             ballFindUpdate(robot.ballDiff);
-        } if (robot.ballDiff.ballDistInchPollen != 0) {
+        } if (!robot.ballDiff.blobsYellow.isEmpty()) {
             ballFindUpdate(robot.ballDiff);
-            pollenDriveTo(robot, nectarRedFind, pollenOnly);
         }
     }
     public void ballFindStop(Robot robot, boolean nectarRedFind, boolean pollenOnly) {

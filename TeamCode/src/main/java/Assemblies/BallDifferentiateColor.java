@@ -161,12 +161,13 @@ public class BallDifferentiateColor {
             desiredBlobs = blobsBlue;
         }
         ballDist();
-        if ((ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 40 && ballDistInchPollen != 0) || (desiredBlobs.isEmpty() && ballDistInchPollen > 0)) {
+        if (lastBallDist == 0 && ((ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 40 && ballDistInchPollen != 0) || (desiredBlobs.isEmpty() && ballDistInchPollen > 0))) {
             lastBallDist = ballDistInchPollen;
 //            telemetry.addData("A", "");
         }
         if (lastBallDist > ballDistInchPollen && ballDistInchPollen <= 35) {
             ballAmount++;
+            lastBallDist = 0;
 //            telemetry.addData("B", "");
         } else {
             telemetry.addData("Last Ball Dist", lastBallDist);
