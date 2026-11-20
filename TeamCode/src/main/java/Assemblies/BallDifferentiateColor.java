@@ -172,6 +172,7 @@ public class BallDifferentiateColor {
         } else {
             telemetry.addData("Last Ball Dist", lastBallDist);
             telemetry.addData("Pollen Dist", ballDistInchPollen);
+            telemetry.addData("Ball Amount", ballAmount);
         }
 
         if (desiredNectarDist < ballDistInchPollen && desiredNectarDist <= 3 || (blobsYellow.isEmpty() && desiredNectarDist > 0)) {
