@@ -20,6 +20,8 @@ import java.util.List;
 public class BallDifferentiateColor {
     double lastBallDist = 0;
     int ballAmount = 0;
+    long start = System.nanoTime();
+    int waitDetermine = 0;
     ColorRange POLLEN_YELLOW = new ColorRange(
             ColorSpace.YCrCb,
             new Scalar(32, 60, 30),
@@ -161,13 +163,15 @@ public class BallDifferentiateColor {
             desiredBlobs = blobsBlue;
         }
         ballDist();
-        if (lastBallDist == 0 && ((ballDistInchPollen < desiredNectarDist && ballDistInchPollen <= 40 && ballDistInchPollen != 0) || (desiredBlobs.isEmpty() && ballDistInchPollen > 0))) {
+        if (ballDistInchPollen <= 40 && !desiredBlobs.isEmpty()) {
             lastBallDist = ballDistInchPollen;
 //            telemetry.addData("A", "");
         }
-        if (lastBallDist > ballDistInchPollen && ballDistInchPollen <= 35) {
+        if (lastBallDist > ballDistInchPollen && ballDistInchPollen <= 35 && waitDetermine == 0) {
             ballAmount++;
             lastBallDist = 0;
+            waitDetermine = 1;
+            start = System.nanoTime();
 //            telemetry.addData("B", "");
         } else {
             telemetry.addData("Last Ball Dist", lastBallDist);
@@ -179,9 +183,13 @@ public class BallDifferentiateColor {
             lastBallDist = desiredNectarDist;
 //            telemetry.addData("C", "");
         }
-        if (lastBallDist > desiredNectarDist && desiredNectarDist == 0) {
+        if (lastBallDist > desiredNectarDist && desiredNectarDist == 0 && waitDetermine == 0) {
             ballAmount++;
 //            telemetry.addData("D", "");
+            waitDetermine = 1;
+        }
+        if (System.nanoTime() - start >= 1E9) {
+            waitDetermine = 0;
         }
         telemetry.update();
     }

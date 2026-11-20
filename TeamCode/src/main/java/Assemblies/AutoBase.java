@@ -119,8 +119,8 @@ public class AutoBase {
     public void ballLocatePollen(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         ballFindUpdate(robot.ballDiff);
         while (robot.ballDiff.blobsYellow.isEmpty()) {
-            robot.driveTrain.drivePowerTurn(-0.3, 0.1);
-            robot.driveTrain.drivePowerTurn(0, 0.1);
+            turnBallCheck(robot, -0.3, 0.1, nectarRedFind, pollenOnly);
+            turnBallCheck(robot, 0, 0.1, nectarRedFind, pollenOnly);
             ballFindUpdate(robot.ballDiff);
         } if (!robot.ballDiff.blobsYellow.isEmpty()) {
             ballFindUpdate(robot.ballDiff);
@@ -128,8 +128,9 @@ public class AutoBase {
     }
     public void ballFindStop(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         if (robot.ballDiff.ballAmount >= 4) {
-            robot.driveTrain.drivePowerTurn(1, 30);
+            turnBallCheck(robot, 0, 30, nectarRedFind, pollenOnly);
             robot.ballDiff.ballAmount = 0;
+            telemetry.addData("AVVVEENNENENENENEN", "");
         }
         telemetry.addData("Balls intaken", robot.ballDiff.ballAmount);
         telemetry.update();
