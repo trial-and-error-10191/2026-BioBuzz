@@ -90,6 +90,8 @@ public class The_Bee_Bot extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // There's a zombie on your lawn
+
         int i_hate_honey_bees_tbh = 0;
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -149,8 +151,8 @@ public class The_Bee_Bot extends LinearOpMode {
             }
 
             if (i_hate_honey_bees_tbh%2 == 1){
-                outtake_large_wheel_power = 0.25;
-                outtake_small_wheel_power = 0.4;
+                outtake_large_wheel_power = 0.45;
+                outtake_small_wheel_power = 0.2;
             }
             else{
                 outtake_large_wheel_power = 0.0;
