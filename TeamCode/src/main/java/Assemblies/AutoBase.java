@@ -10,7 +10,9 @@ public class AutoBase {
     double desiredNectarDist;
     List<ColorBlobLocatorProcessor.Blob> desiredBlobs;
     Telemetry telemetry;
+    long loopTimer = System.nanoTime();
     long start = System.nanoTime();
+    long buffer = System.nanoTime();
     public AutoBase(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
@@ -42,14 +44,17 @@ public class AutoBase {
         // keep looping while we are still active, and BOTH motors are running.
         while (System.nanoTime() - start < time * 1E9) {
             robot.driveTrain.setPower();
-            robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
+            robot.ballDiff.ballRecord();
+            if (System.nanoTime() - buffer <= 2E9) {
+                robot.ballDiff.ballCount(nectarRedFind, pollenOnly);
+            }
         }
     }
     public void closeBallTarget(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
         while (robot.ballDiff.ballAmount < 4) {
             ballFindUpdate(robot.ballDiff);
             Wait(2);
-            ballLocatePollen(robot, nectarRedFind, pollenOnly);
+            closestBallCheck(robot, nectarRedFind, pollenOnly);
             pollenDriveTo(robot, nectarRedFind, pollenOnly);
             nectarDriveTo(robot);
         }
@@ -134,6 +139,19 @@ public class AutoBase {
         }
         telemetry.addData("Balls intaken", robot.ballDiff.ballAmount);
         telemetry.update();
+    }
+    public void closestBallCheck(Robot robot, boolean nectarRedFind, boolean pollenOnly) {
+        robot.ballDiff.waitDetermine = 1;
+        loopTimer = System.nanoTime();
+        while ((System.nanoTime() - loopTimer) * 1E-9 <= 2.5) {
+            turnBallCheck(robot, 0.4, 0.5, nectarRedFind, pollenOnly);
+            turnBallCheck(robot, 0, 0.3, nectarRedFind, pollenOnly);
+        }
+        if (robot.ballDiff.shortestDist != 0) {
+            robot.driveTrain.drivePowerTurn(-0.4, Math.abs(robot.ballDiff.ballTrackTimer) * 1E-9);
+            robot.driveTrain.drivePowerTurn(0, 0.1);
+            robot.ballDiff.waitDetermine = 0;
+        }
     }
     public void Wait(double time) {
         start = System.nanoTime();

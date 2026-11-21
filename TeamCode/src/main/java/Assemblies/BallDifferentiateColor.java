@@ -21,7 +21,9 @@ public class BallDifferentiateColor {
     double lastBallDist = 0;
     int ballAmount = 0;
     long start = System.nanoTime();
+    long ballTrackTimer = System.nanoTime();
     int waitDetermine = 0;
+    double shortestDist;
     ColorRange POLLEN_YELLOW = new ColorRange(
             ColorSpace.YCrCb,
             new Scalar(32, 60, 30),
@@ -152,6 +154,16 @@ public class BallDifferentiateColor {
         }
     }
 
+    public void ballRecord() {
+        if (shortestDist < ballDistInchPollen && !blobsYellow.isEmpty()) {
+            shortestDist = ballDistInchPollen;
+            ballTrackTimer -= System.nanoTime();
+        }
+        telemetry.addData("shortest dist", shortestDist);
+        telemetry.addData("ball tracking timer", ballTrackTimer);
+        telemetry.update();
+    }
+
     public void ballCount(boolean nectarRedFind, boolean pollenOnly) {
         double desiredNectarDist = 1E10;
         List<ColorBlobLocatorProcessor.Blob> desiredBlobs = blobsYellow;
@@ -188,7 +200,7 @@ public class BallDifferentiateColor {
 //            telemetry.addData("D", "");
             waitDetermine = 1;
         }
-        if (System.nanoTime() - start >= 1E9) {
+        if (System.nanoTime() - start >= 1.7E9) {
             waitDetermine = 0;
         }
         telemetry.update();

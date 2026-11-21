@@ -11,6 +11,6 @@ public class DriveTimeTest extends LinearOpMode {
     public void runOpMode() {
         DriveTrainMecanum driveTrain = new DriveTrainMecanum(hardwareMap, telemetry);
         waitForStart();
-        driveTrain.drivePowerForward(0.5, 1); // Goes 45 inches at this speed
+        driveTrain.drivePowerTurn(0.4, 2.5); // Goes 45 inches at this speed
     }
 }
